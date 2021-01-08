@@ -1,16 +1,18 @@
-# This is a sample Python script.
+# Karl Mattson - #001253438
+# This program simulates delivery of packages
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+import distancetable
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+
+
+
+# test code for distance table import
+# distances = distancetable.Distances()
+# test_addresses = ['HUB', '1060 Dalton Ave S', '1330 2100 S','1488 4800 S', '177 W Price Ave', '195 W Oakland Ave']
+# for i in range(len(test_addresses)):
+#     for j in range(len(test_addresses)):
+#         print("Source: " + test_addresses[i] + " --- Destination: " + test_addresses[j] +
+#               " --- Distance: " + repr(distances.get_distance(test_addresses[i], test_addresses[j])))
