@@ -1,5 +1,7 @@
 # Functions for importing required csv files
 import csv
+import packagehash
+import package
 
 
 # Imports distance table.
@@ -23,5 +25,30 @@ def import_distances():
     return distance_dict
 
 
-def import_packages():
-    pass
+# Imports package table.
+# Runs in O(n) time where n is the number of packages to import
+def import_packages(package_hash):
+    package_reader = csv.reader(open('WGUPS Package File.csv'), delimiter=',', skipinitialspace=True)
+
+    col_headers = package_reader.__next__()
+
+    # iterate through each row to load packages
+    for row in package_reader:
+        package_id = int(row[0])
+        address = row[1]
+        city = row[2]
+        state = row[3]
+        postal_code = row[4]
+        deadline = row[5]
+        weight = row[6]
+        truck = row[7]
+        depart = row[8]
+
+        # create package object
+        new_package = package.Package(package_id, address, deadline, city, state, postal_code, weight, truck, depart)
+
+        # add package to hash table
+        package_hash.add(new_package)
+
+        # test that package added correctly
+        # print((package_hash.get_package(package_id)).get_address())

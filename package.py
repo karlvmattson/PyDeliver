@@ -4,18 +4,25 @@ class Package:
     _address = ""
     _deadline = ""
     _city = ""
+    _state = ""
     _zip = ""
     _weight = 0.0
     _status = ""
+    _departed = ""
+    _delivered = ""
+    _requested_truck = 0
+    _requested_departure = ""
 
-    def __init__(self, new_id, address, deadline, city, postal_code, weight, status):
+    def __init__(self, new_id, address, deadline, city, state, postal_code, weight, requested_truck, requested_departure):
         self._id = new_id
         self._address = address
         self._deadline = deadline
         self._city = city
+        self._state = state
         self._zip = postal_code
         self._weight = weight
-        self._status = status
+        self._requested_truck = requested_truck
+        self._requested_departure = requested_departure
 
     def set_id(self, new_id):
         self._id = new_id
@@ -41,6 +48,12 @@ class Package:
     def get_city(self):
         return self._city
 
+    def set_state(self, new_state):
+        self._state = new_state
+
+    def get_state(self):
+        return self._state
+
     def set_zip(self, new_zip):
         self._zip = new_zip
 
@@ -58,3 +71,27 @@ class Package:
 
     def get_status(self):
         return self._status
+
+    def set_departed(self, new_departed):
+        self._departed = new_departed
+
+    def get_departed(self):
+        return self._departed
+
+    def set_delivered(self, new_delivered):
+        self._delivered = new_delivered
+
+    def get_delivered(self):
+        return self._delivered
+
+    def set_requested_truck(self, new_requested_truck):
+        self._requested_truck = new_requested_truck
+
+    def get_requested_truck(self):
+        return self._requested_truck
+
+    def set_requested_departure(self, new_requested_departure):
+        self._requested_departure = new_requested_departure
+
+    def get_requested_departure(self):
+        return self._requested_departure

@@ -1,11 +1,15 @@
 # Implements a direct-address hash table. Self-adjusts to resize the table as needed.
 # All operations run in O(1) time
+import csvimport
+
+
 class PackageHash:
     _hash_table = []
 
     def __init__(self):
         # start with array size 20
         self._hash_table = [None]*20
+        self.load_packages()
 
     # Self-adjusting function
     def add(self, package):
@@ -30,4 +34,13 @@ class PackageHash:
             return self._hash_table[key - 1]
         else:
             return None
+
+    def load_packages(self):
+        csvimport.import_packages(self)
+
+    def print_contents(self):
+        for package in self._hash_table:
+            if package is None:
+                continue
+            print(repr(package.get_id()) + ": " + package.get_address())
 
