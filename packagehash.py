@@ -11,6 +11,17 @@ class PackageHash:
         self._hash_table = [None]*20
         self.load_packages()
 
+    def __iter__(self):
+        self.n = 0
+        return self
+
+    def __next__(self):
+        if self.n >= len(self._hash_table):
+            raise StopIteration
+        else:
+            self.n += 1
+            return self._hash_table[self.n-1]
+
     # Self-adjusting function
     def add(self, package):
         # this is the hashing function, directly map to package id

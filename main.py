@@ -3,12 +3,54 @@
 
 import distancetable
 import packagehash
+import datetime
+import truck
+import truckloader
+import dispatcher
+
 
 # get distances from CSV
 distances = distancetable.Distances()
 
 # get packages from CSV
 packages = packagehash.PackageHash()
+
+# set up scenario variables
+total_trucks = 3
+total_drivers = 2
+vehicle_speed = 18
+truck_load_limit = 16
+starting_time = datetime.datetime.strptime("08:00", '%H:%M')
+
+# create trucks
+truck_list = [truck.Truck() for i in range(total_trucks)]
+
+# load trucks
+truck_loader = truckloader.TruckLoader(total_drivers, truck_load_limit, starting_time, vehicle_speed)
+truck_loader.load_trucks(truck_list, packages, distances)
+# for t in range(len(truck_list)):
+#     print("Truck " + repr(t) + " has " + repr(truck_list[t].package_count()) + " packages.")
+
+# send trucks on deliveries
+dispatcher = dispatcher.Dispatcher(starting_time, truck_list, total_drivers, distances)
+results = dispatcher.dispatch_trucks()
+
+# print results
+print("Finished time is " + results[0].strftime("%H:%M"))
+print("Finished distance is " + repr(results[1]))
+
+
+
+# check if there are no more packages to deliver
+    # if not, print end of day report
+
+# check if truck is eligible to depart
+
+    # if so, send truck
+
+    # if no truck eligible to depart, advance time until a truck is eligible
+
+
 
 
 

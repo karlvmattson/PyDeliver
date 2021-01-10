@@ -19,4 +19,4 @@ class Distances:
         elif source_address == destination_address:
             return 0
         else:
-            return None
+            return 0

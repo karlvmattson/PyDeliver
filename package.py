@@ -95,3 +95,4 @@ class Package:
 
     def get_requested_departure(self):
         return self._requested_departure
+
