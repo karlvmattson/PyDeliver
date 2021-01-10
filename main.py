@@ -23,7 +23,7 @@ truck_load_limit = 16
 starting_time = datetime.datetime.strptime("08:00", '%H:%M')
 
 # create trucks
-truck_list = [truck.Truck() for i in range(total_trucks)]
+truck_list = [truck.Truck(starting_time) for i in range(total_trucks)]
 
 # load trucks
 truck_loader = truckloader.TruckLoader(total_drivers, truck_load_limit, starting_time, vehicle_speed)
@@ -41,14 +41,7 @@ print("Finished distance is " + repr(results[1]))
 
 
 
-# check if there are no more packages to deliver
-    # if not, print end of day report
 
-# check if truck is eligible to depart
-
-    # if so, send truck
-
-    # if no truck eligible to depart, advance time until a truck is eligible
 
 
 

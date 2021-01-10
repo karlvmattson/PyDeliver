@@ -9,12 +9,13 @@ import datetime
 class Truck:
     _speed = 18
 
-    def __init__(self):
+    def __init__(self, earliest_departure):
         self.format = "%H:%M"
         self.delivery_queue = []
         self._distance_traveled = 0
         self._current_time = 0
         self._current_location = "HUB"
+        self._earliest_departure = earliest_departure
 
     def package_count(self):
         return len(self.delivery_queue)
@@ -24,6 +25,12 @@ class Truck:
 
     def set_speed(self, new_speed):
         self._speed = new_speed
+
+    def get_earliest_departure(self):
+        return self._earliest_departure
+
+    def set_earliest_departure(self, new_earliest_departure):
+        self._earliest_departure = new_earliest_departure
 
     def get_current_time(self):
         return self._current_time
@@ -56,15 +63,15 @@ class Truck:
 
         # calculate distance to next stop
         distance = distance_table.get_distance(self._current_location, destination)
-        print("Distance from " + self._current_location + " to " + destination + " is " + repr(distance))
+        #print("Distance from " + self._current_location + " to " + destination + " is " + repr(distance))
 
         # increment distance and time, set current location to next stop
-        print("Time before traveling is " + self.get_current_time().strftime(self.format))
+        #print("Time before traveling is " + self.get_current_time().strftime(self.format))
         self.set_distance_traveled(self.get_distance_traveled() + distance)
         time = self.get_current_time()
         new_time = time + datetime.timedelta(hours=(distance / self.get_speed()))
         self.set_current_time(new_time)
-        print("Time after traveling is " + self.get_current_time().strftime(self.format))
+        #print("Time after traveling is " + self.get_current_time().strftime(self.format))
         self.set_current_location(destination)
 
     # main simulation for an individual truck
@@ -83,6 +90,9 @@ class Truck:
 
             # deliver current package
             self.deliver(package)
+
+        # clear delivery queue
+        self.delivery_queue.clear()
 
         # when finished delivering packages return to hub
         self.travel("HUB", distancetable)
