@@ -86,7 +86,9 @@ class TruckLoader:
             # elif len(optional_packages) > 0:
             #     result = get_closest_package(location, package_list + optional_packages, packages, distances)
             else:
-                result = get_closest_package(location, package_list, packages, distances)
+                result = get_closest_package(location, package_list + optional_packages, packages, distances)
+                if result[1] > 0:
+                    result = get_closest_package(location, package_list, packages, distances)
             closest_distance = result[1]
             next_package = result[0]
             new_location = packages.get_package(next_package).get_address()
@@ -164,7 +166,7 @@ class TruckLoader:
                     elif packages.get_package(p_id).get_deadline() == current_earliest:
                         current_list.append(p_id)
                 results = self.load_onto_truck(trucks[t], truck_location, truck_time, current_list, packages, distances,
-                                               False, package_bucket)
+                                               False, truck_bucket[t] + package_bucket)
                 # [new_location, new_time, leftover_packages]
                 # make sure any leftover packages go to the next truck
                 if len(results[2]) > 0:
@@ -180,6 +182,8 @@ class TruckLoader:
                         early_packages.remove(p.get_id())
                     if p.get_id() in package_bucket:
                         package_bucket.remove(p.get_id())
+                    if p.get_id() in truck_bucket[t]:
+                        truck_bucket[t].remove(p.get_id())
 
                 # repeats process until early packages are loaded
 
