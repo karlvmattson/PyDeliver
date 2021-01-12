@@ -34,6 +34,21 @@ def get_farthest_package(package_list, packages, distances):
     return [farthest_package, farthest_distance]
 
 
+def get_closest_outward_package(location, package_list, packages, distances):
+    closest_package = 0
+    closest_distance = float("inf")
+    for p in package_list:
+        distance_to_package = distances.get_distance(
+            location, packagehash.PackageHash.get_package(packages, p).get_address())
+        if distance_to_package < closest_distance and distances.get_distance(
+            "HUB", packagehash.PackageHash.get_package(packages, p).get_address()) > \
+                distances.get_distance("HUB", location):
+            closest_package = p
+            closest_distance = distance_to_package
+
+    return [closest_package, closest_distance]
+
+
 class TruckLoader:
     _load_limit = 0
     _drivers = 0
@@ -46,31 +61,40 @@ class TruckLoader:
         self._start_time = start_time
         self._vehicle_speed = truck_speed
 
-    def load_onto_truck(self, target_truck, location, current_time, package_list, packages, distances, depth_first):
+    def load_onto_truck(self, target_truck, location, current_time, package_list, packages, distances, depth_first, optional_packages):
         new_location = location
         new_time = current_time
         leftover_packages = []
         farthest_package = 0
 
-        # if going for depth first, start with the furthest package from the depot and run from there
-        if depth_first:
-            # find farthest package
-            result = get_farthest_package(package_list, packages, distances)
-            farthest_package = result[0]
-        else:
-            result = [None, None]
+        # # if going for depth first, start with the furthest package from the depot and run from there
+        # if depth_first:
+        #     # find farthest package
+        #     result = get_farthest_package(package_list, packages, distances)
+        #     farthest_package = result[0]
+        # else:
+        #     result = [None, None]
 
         while len(package_list) > 0:
             # find next package
-            if farthest_package > 0:
-                farthest_package = 0
+            if (self._load_limit - len(target_truck.delivery_queue)) == len(package_list):
+                result = get_closest_package(location, package_list, packages, distances)
+            elif depth_first:
+                result = get_closest_outward_package(location, package_list + optional_packages, packages, distances)
+                if result[0] == 0:
+                    result = get_closest_package(location, package_list + optional_packages, packages, distances)
+            # elif len(optional_packages) > 0:
+            #     result = get_closest_package(location, package_list + optional_packages, packages, distances)
             else:
                 result = get_closest_package(location, package_list, packages, distances)
             closest_distance = result[1]
             next_package = result[0]
             new_location = packages.get_package(next_package).get_address()
             target_truck.load_package(packages.get_package(next_package))
-            package_list.remove(next_package)
+            if next_package in package_list:
+                package_list.remove(next_package)
+            else:
+                optional_packages.remove(next_package)
 
             # update truck's departure time
             if target_truck.get_earliest_departure() < packages.get_package(next_package).get_requested_departure():
@@ -125,6 +149,7 @@ class TruckLoader:
                     package_bucket.remove(i)
 
             print("Truck " + repr(t + 1) + " has " + repr(len(early_packages)) + " early packages to deliver.")
+            trucks[t].early_package_count = len(early_packages)
 
             # peel off packages in groups by delivery time, then run greedy on those subgroups from last location
             while len(early_packages) > 0:
@@ -139,7 +164,7 @@ class TruckLoader:
                     elif packages.get_package(p_id).get_deadline() == current_earliest:
                         current_list.append(p_id)
                 results = self.load_onto_truck(trucks[t], truck_location, truck_time, current_list, packages, distances,
-                                               False)
+                                               False, package_bucket)
                 # [new_location, new_time, leftover_packages]
                 # make sure any leftover packages go to the next truck
                 if len(results[2]) > 0:
@@ -153,17 +178,22 @@ class TruckLoader:
                 for p in trucks[t].delivery_queue:
                     if p.get_id() in early_packages:
                         early_packages.remove(p.get_id())
+                    if p.get_id() in package_bucket:
+                        package_bucket.remove(p.get_id())
 
                 # repeats process until early packages are loaded
 
             # finish truck-specific packages
             if len(truck_bucket[t]) > 0:
-                self.load_onto_truck(trucks[t], truck_location, truck_time, truck_bucket[t], packages, distances, True)
+                self.load_onto_truck(trucks[t], truck_location, truck_time, truck_bucket[t], packages, distances, True, package_bucket)
+                for p in trucks[t].delivery_queue:
+                    if p.get_id() in package_bucket:
+                        package_bucket.remove(p.get_id())
 
             # pass package_bucket to be loaded to the truck until truck is full or bucket runs out
             if len(package_bucket) > 0:
                 results = self.load_onto_truck(trucks[t], truck_location, truck_time,
-                                               package_bucket, packages, distances, True)
+                                               package_bucket, packages, distances, True, [])
                 package_bucket = results[2]
             print("Truck " + repr(t + 1) + " is loaded with " + repr(len(trucks[t].delivery_queue)) + " packages!")
 

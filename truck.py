@@ -16,6 +16,7 @@ class Truck:
         self._current_time = 0
         self._current_location = "HUB"
         self._earliest_departure = earliest_departure
+        self.early_package_count = 0
 
     def package_count(self):
         return len(self.delivery_queue)
