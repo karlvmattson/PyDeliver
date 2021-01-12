@@ -31,7 +31,7 @@ truck_loader.load_trucks(truck_list, packages, distances)
 # for t in range(len(truck_list)):
 #     print("Truck " + repr(t) + " has " + repr(truck_list[t].package_count()) + " packages.")
 print("Load process finished...")
-exit(0)
+#exit(0)
 # send trucks on deliveries
 dispatcher = dispatcher.Dispatcher(starting_time, truck_list, total_drivers, distances)
 results = dispatcher.dispatch_trucks()

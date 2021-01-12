@@ -1,17 +1,20 @@
 # A single package to be delivered
+import datetime
+
+
 class Package:
-    _id = 0
-    _address = ""
-    _deadline = ""
-    _city = ""
-    _state = ""
-    _zip = ""
-    _weight = 0.0
-    _status = ""
-    _departed = ""
-    _delivered = ""
-    _requested_truck = 0
-    _requested_departure = ""
+    # _id = 0
+    # _address = ""
+    # _deadline = ""
+    # _city = ""
+    # _state = ""
+    # _zip = ""
+    # _weight = 0.0
+    # _status = ""
+    # _departed = ""
+    # _delivered = ""
+    # _requested_truck = 0
+    # _requested_departure = ""
 
     def __init__(self, new_id, address, deadline, city, state, postal_code, weight, requested_truck, requested_departure):
         self._id = new_id
@@ -22,7 +25,10 @@ class Package:
         self._zip = postal_code
         self._weight = weight
         self._requested_truck = requested_truck
-        self._requested_departure = requested_departure
+        if requested_departure == "":
+            self._requested_departure = datetime.datetime.min
+        else:
+            self._requested_departure = datetime.datetime.strptime(requested_departure.replace(" AM", ""), "%H:%M")
 
     def set_id(self, new_id):
         self._id = new_id
@@ -40,7 +46,10 @@ class Package:
         self._deadline = new_deadline
 
     def get_deadline(self):
-        return self._deadline
+        if self._deadline == "EOD":
+            return self._deadline
+        else:
+            return datetime.datetime.strptime(self._deadline.replace(" AM", ""), "%H:%M")
 
     def set_city(self, new_city):
         self._city = new_city

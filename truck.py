@@ -58,6 +58,9 @@ class Truck:
     def deliver(self, package):
         package.set_status("Delivered")
         package.set_delivered(self._current_time)
+        if package.get_deadline() != "EOD":
+            if package.get_deadline() < self._current_time:
+                print("Package was delivered late!")
 
     def travel(self, destination, distance_table):
 

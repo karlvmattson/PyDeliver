@@ -62,7 +62,7 @@ class Dispatcher:
                 # we must be waiting for a truck to reach its earliest departure
                 # advance time to next available truck
                 print("Waiting for next truck to be eligible to depart...")
-                earliest_truck = [0, float("inf")]
+                earliest_truck = [0, datetime.datetime.max]
                 for t in range(len(trucks)):
                     departure = trucks[t].get_earliest_departure()
                     if trucks[t].package_count() > 0 and departure < earliest_truck[1]:
