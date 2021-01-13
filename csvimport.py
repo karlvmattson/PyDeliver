@@ -1,6 +1,5 @@
 # Functions for importing required csv files
 import csv
-import packagehash
 import package
 
 
@@ -30,7 +29,7 @@ def import_distances():
 def import_packages(package_hash):
     package_reader = csv.reader(open('WGUPS Package File.csv'), delimiter=',', skipinitialspace=True)
 
-    col_headers = package_reader.__next__()
+    package_reader.__next__()
 
     # iterate through each row to load packages
     for row in package_reader:
@@ -49,6 +48,3 @@ def import_packages(package_hash):
 
         # add package to hash table
         package_hash.add(new_package)
-
-        # test that package added correctly
-        # print((package_hash.get_package(package_id)).get_address())

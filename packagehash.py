@@ -1,6 +1,7 @@
 # Implements a direct-address hash table. Self-adjusts to resize the table as needed.
 # All operations run in O(1) time
 import csvimport
+import datetime
 
 
 class PackageHash:
@@ -8,7 +9,7 @@ class PackageHash:
 
     def __init__(self):
         # start with array size 20
-        self._hash_table = [None]*20
+        self._hash_table = [None] * 20
         self.load_packages()
 
     def __iter__(self):
@@ -20,12 +21,12 @@ class PackageHash:
             raise StopIteration
         else:
             self.n += 1
-            return self._hash_table[self.n-1]
+            return self._hash_table[self.n - 1]
 
     # Self-adjusting function
     def add(self, package):
         # this is the hashing function, directly map to package id
-        new_id = package.get_id()-1
+        new_id = package.get_id() - 1
 
         # resize list if it is too small for the new id
         if new_id >= len(self._hash_table):
@@ -37,7 +38,7 @@ class PackageHash:
     def remove(self, key):
         # make sure key is valid
         if key - 1 < len(self._hash_table):
-            self._hash_table[key-1] = None
+            self._hash_table[key - 1] = None
 
     def get_package(self, key):
         # make sure key is valid
@@ -49,9 +50,24 @@ class PackageHash:
     def load_packages(self):
         csvimport.import_packages(self)
 
-    def print_contents(self):
-        for package in self._hash_table:
-            if package is None:
-                continue
-            print(repr(package.get_id()) + ": " + package.get_address())
-
+    def print_all(self):
+        for p in range(len(self._hash_table)):
+            if self.get_package(p) is not None:
+                pack = self.get_package(p)
+                i = pack.get_id()
+                address = pack.get_address()
+                departure = pack.get_departed()
+                delivered = pack.get_delivered()
+                deadline = pack.get_deadline()
+                status = pack.get_status()
+                if status == "At the hub":
+                    departure = ""
+                    delivered = ""
+                elif status == "En route":
+                    departure = datetime.datetime.strftime(departure, "%H:%M")
+                    delivered = ""
+                elif status == "Delivered":
+                    departure = datetime.datetime.strftime(departure, "%H:%M")
+                    delivered = datetime.datetime.strftime(delivered, "%H:%M")
+                print('{:>4}:  Destination: {:<40}  Departed: {:>6}     Delivered: {:>6}     Status: {:<10}'.format(
+                    i, address, departure, delivered, status))

@@ -1,5 +1,4 @@
 # Handles dispatching of trucks
-import truck
 import datetime
 
 
@@ -12,7 +11,7 @@ class Dispatcher:
         self._trucks = trucks
         self._drivers = drivers
 
-    def dispatch_trucks(self):
+    def dispatch_trucks(self, end_time):
         current_time = self._current_time
         distance_traveled = 0
         drivers_at_hub = self._drivers
@@ -22,18 +21,17 @@ class Dispatcher:
         trucks_returned = 0
         last_truck_returned = self._current_time
 
-        # check if there are no more packages to deliver
-        while trucks_returned < trucks_to_send:
+        # check if there are trucks to send
+        while trucks_returned < trucks_to_send and end_time > current_time:
             # check if truck is eligible to depart
-
             for t in trucks:
                 if drivers_at_hub > 0 and t.package_count() > 0 and t.get_earliest_departure() <= current_time:
                     # if so, send truck
                     drivers_at_hub -= 1
                     print("Sending truck at " + current_time.strftime(self.format))
-                    result = t.depart(current_time, self._distances)
-                    print("Truck returned at " + result[0].strftime(self.format) + " after driving " + repr(
-                        result[1]) + " miles.")
+                    result = t.depart(current_time, self._distances, end_time)
+                    #     print("Truck returned at " + result[0].strftime(self.format) + " after driving " + repr(
+                    #        result[1]) + " miles.")
                     distance_traveled += result[1]
                     if last_truck_returned < result[0]:
                         last_truck_returned = result[0]
@@ -70,11 +68,4 @@ class Dispatcher:
                         earliest_truck[1] = departure
                 current_time = earliest_truck[1]
 
-        # if not, return results
         return [last_truck_returned, distance_traveled]
-
-        # most basic algorithm, sends trucks one at a time
-        # result = trucks[trucks_returned].depart(current_time, self._distances)
-        # current_time = result[0]
-        # distance_traveled += result[1]
-        # trucks_returned += 1

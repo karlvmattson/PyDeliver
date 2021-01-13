@@ -30,32 +30,30 @@ truck_loader = truckloader.TruckLoader(total_drivers, truck_load_limit, starting
 truck_loader.load_trucks(truck_list, packages, distances)
 # for t in range(len(truck_list)):
 #     print("Truck " + repr(t) + " has " + repr(truck_list[t].package_count()) + " packages.")
-print("Load process finished...")
-#exit(0)
+# print("Load process finished...")
+
+is_valid_input = False
+user_input = ""
+while not is_valid_input:
+    print("WGUPS truck simulation.")
+    print("Enter a time to stop simulation (HH:MM AM/PM)")
+    print("or press enter to run program to its conclusion.")
+    user_input = input("-->  ")
+    if user_input == "":
+        user_input = datetime.datetime.strptime("22:00", "%H:%M")
+        is_valid_input = True
+    else:
+        try:
+            user_input = datetime.datetime.strptime(user_input, "%I:%M %p")
+            is_valid_input = True
+        except ValueError:
+            print(ValueError("Incorrect format, should be HH:MM AM/PM"))
+
 # send trucks on deliveries
 dispatcher = dispatcher.Dispatcher(starting_time, truck_list, total_drivers, distances)
-results = dispatcher.dispatch_trucks()
+results = dispatcher.dispatch_trucks(user_input)
 
 # print results
+packages.print_all()
 print("Finished time is " + results[0].strftime("%H:%M"))
 print("Finished distance is " + repr(results[1]))
-
-
-
-
-
-
-
-
-
-
-# #test code for package table import
-# packages.print_contents()
-
-
-# test code for distance table import
-# test_addresses = ['HUB', '1060 Dalton Ave S', '1330 2100 S','1488 4800 S', '177 W Price Ave', '195 W Oakland Ave']
-# for i in range(len(test_addresses)):
-#     for j in range(len(test_addresses)):
-#         print("Source: " + test_addresses[i] + " --- Destination: " + test_addresses[j] +
-#               " --- Distance: " + repr(distances.get_distance(test_addresses[i], test_addresses[j])))

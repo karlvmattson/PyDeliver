@@ -53,7 +53,7 @@ class Truck:
 
     def load_package(self, package):
         self.delivery_queue.append(package)
-        package.set_status("Loaded")
+        # package.set_status("Loaded")
         #   print("Now carrying " + repr(len(self.delivery_queue)) + " packages.")
 
     def deliver(self, package):
@@ -63,23 +63,28 @@ class Truck:
             if package.get_deadline() < self._current_time:
                 print("Package was delivered late!")
 
-    def travel(self, destination, distance_table):
+    def travel(self, destination, distance_table, end_time):
 
         # calculate distance to next stop
         distance = distance_table.get_distance(self._current_location, destination)
-        #print("Distance from " + self._current_location + " to " + destination + " is " + repr(distance))
+        # print("Distance from " + self._current_location + " to " + destination + " is " + repr(distance))
 
         # increment distance and time, set current location to next stop
-        #print("Time before traveling is " + self.get_current_time().strftime(self.format))
+        # print("Time before traveling is " + self.get_current_time().strftime(self.format))
         self.set_distance_traveled(self.get_distance_traveled() + distance)
         time = self.get_current_time()
         new_time = time + datetime.timedelta(hours=(distance / self.get_speed()))
+        if new_time > end_time:
+            self.set_current_time(end_time)
+            return False
+
         self.set_current_time(new_time)
-        #print("Time after traveling is " + self.get_current_time().strftime(self.format))
+        # print("Time after traveling is " + self.get_current_time().strftime(self.format))
         self.set_current_location(destination)
+        return True
 
     # main simulation for an individual truck
-    def depart(self, time, distancetable):
+    def depart(self, time, distancetable, end_time):
         self.set_current_time(time)
 
         # set all packages on truck to En route and log their departure time
@@ -90,7 +95,9 @@ class Truck:
         # load next package
         for package in self.delivery_queue:
             # travel to next stop
-            self.travel(package.get_address(), distancetable)
+            if not self.travel(package.get_address(), distancetable, end_time):
+                # we ran up against the user specified stop time
+                return [self.get_current_time(), self.get_distance_traveled()]
 
             # deliver current package
             self.deliver(package)
@@ -99,7 +106,7 @@ class Truck:
         self.delivery_queue.clear()
 
         # when finished delivering packages return to hub
-        self.travel("HUB", distancetable)
+        self.travel("HUB", distancetable, end_time)
 
         # return current time and distance traveled
         return [self.get_current_time(), self.get_distance_traveled()]

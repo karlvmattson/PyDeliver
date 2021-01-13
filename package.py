@@ -3,20 +3,9 @@ import datetime
 
 
 class Package:
-    # _id = 0
-    # _address = ""
-    # _deadline = ""
-    # _city = ""
-    # _state = ""
-    # _zip = ""
-    # _weight = 0.0
-    # _status = ""
-    # _departed = ""
-    # _delivered = ""
-    # _requested_truck = 0
-    # _requested_departure = ""
 
-    def __init__(self, new_id, address, deadline, city, state, postal_code, weight, requested_truck, requested_departure):
+    def __init__(self, new_id, address, deadline, city, state,
+                 postal_code, weight, requested_truck, requested_departure):
         self._id = new_id
         self._address = address
         self._deadline = deadline
@@ -25,6 +14,9 @@ class Package:
         self._zip = postal_code
         self._weight = weight
         self._requested_truck = requested_truck
+        self._departed = datetime.datetime.min
+        self._delivered = datetime.datetime.min
+        self._status = "At the hub"
         if requested_departure == "":
             self._requested_departure = datetime.datetime.min
         else:
@@ -104,4 +96,3 @@ class Package:
 
     def get_requested_departure(self):
         return self._requested_departure
-

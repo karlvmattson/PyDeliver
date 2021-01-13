@@ -1,9 +1,6 @@
 # Contains algorithm for truck loading
-import truck
-import distancetable
-import packagehash
-import package
 import datetime
+import packagehash
 
 
 def get_closest_package(location, package_list, packages, distances):
@@ -61,21 +58,13 @@ class TruckLoader:
         self._start_time = start_time
         self._vehicle_speed = truck_speed
 
-    def load_onto_truck(self, target_truck, location, current_time, package_list, packages, distances, depth_first, optional_packages):
+    def load_onto_truck(self, target_truck, location, current_time, package_list,
+                        packages, distances, depth_first, optional_packages):
         new_location = location
         new_time = current_time
         leftover_packages = []
-        farthest_package = 0
 
-        # # if going for depth first, start with the furthest package from the depot and run from there
-        # if depth_first:
-        #     # find farthest package
-        #     result = get_farthest_package(package_list, packages, distances)
-        #     farthest_package = result[0]
-        # else:
-        #     result = [None, None]
-
-        while len(package_list) > 0:
+        while len(package_list) > 0 and len(target_truck.delivery_queue) < self._load_limit:
             # find next package
             if (self._load_limit - len(target_truck.delivery_queue)) == len(package_list):
                 result = get_closest_package(location, package_list, packages, distances)
@@ -83,13 +72,10 @@ class TruckLoader:
                 result = get_closest_outward_package(location, package_list + optional_packages, packages, distances)
                 if result[0] == 0:
                     result = get_closest_package(location, package_list + optional_packages, packages, distances)
-            # elif len(optional_packages) > 0:
-            #     result = get_closest_package(location, package_list + optional_packages, packages, distances)
             else:
                 result = get_closest_package(location, package_list + optional_packages, packages, distances)
                 if result[1] > 0:
                     result = get_closest_package(location, package_list, packages, distances)
-            closest_distance = result[1]
             next_package = result[0]
             new_location = packages.get_package(next_package).get_address()
             target_truck.load_package(packages.get_package(next_package))
@@ -103,6 +89,7 @@ class TruckLoader:
                 target_truck.set_earliest_departure(packages.get_package(next_package).get_requested_departure())
 
             # see if truck is full
+           # print("Truck has " + repr(len(target_truck.delivery_queue)) + " packages out of " + repr(self._load_limit))
             if len(target_truck.delivery_queue) == self._load_limit:
                 # move remaining packages to leftovers
                 leftover_packages.extend(package_list)
@@ -117,7 +104,7 @@ class TruckLoader:
 
         # Create a bucket for each truck and an additional bucket for available packages
         package_bucket = []
-        truck_bucket = [[] for t in range(len(trucks))]
+        truck_bucket = [[] for _ in range(len(trucks))]
 
         # Copy package ids into their requested buckets to be loaded to trucks
         for p in packages:
@@ -126,16 +113,10 @@ class TruckLoader:
             else:
                 package_bucket.append(p.get_id())
 
-        # Queue up deliveries
-        # done = False
-        #
-        # while not done:
-
         for t in range(len(trucks)):
             truck_time = self._start_time
             truck_location = "HUB"
             early_packages = []
-
             for p in range(len(truck_bucket[t])):
                 p_id = truck_bucket[t][p]
                 if packages.get_package(p_id).get_deadline() != "EOD":
@@ -150,7 +131,7 @@ class TruckLoader:
                 elif i in package_bucket:
                     package_bucket.remove(i)
 
-            print("Truck " + repr(t + 1) + " has " + repr(len(early_packages)) + " early packages to deliver.")
+           # print("Truck " + repr(t + 1) + " has " + repr(len(early_packages)) + " early packages to deliver.")
             trucks[t].early_package_count = len(early_packages)
 
             # peel off packages in groups by delivery time, then run greedy on those subgroups from last location
@@ -189,7 +170,8 @@ class TruckLoader:
 
             # finish truck-specific packages
             if len(truck_bucket[t]) > 0:
-                self.load_onto_truck(trucks[t], truck_location, truck_time, truck_bucket[t], packages, distances, True, package_bucket)
+                self.load_onto_truck(trucks[t], truck_location, truck_time,
+                                     truck_bucket[t], packages, distances, True, package_bucket)
                 for p in trucks[t].delivery_queue:
                     if p.get_id() in package_bucket:
                         package_bucket.remove(p.get_id())
@@ -198,33 +180,9 @@ class TruckLoader:
             if len(package_bucket) > 0:
                 results = self.load_onto_truck(trucks[t], truck_location, truck_time,
                                                package_bucket, packages, distances, True, [])
-                package_bucket = results[2]
-            print("Truck " + repr(t + 1) + " is loaded with " + repr(len(trucks[t].delivery_queue)) + " packages!")
+                for p in trucks[t].delivery_queue:
+                    if p.get_id() in package_bucket:
+                        package_bucket.remove(p.get_id())
+            # print("Truck " + repr(t + 1) + " is loaded with " + repr(len(trucks[t].delivery_queue)) + " packages!")
 
         return trucks
-
-        # Queue up trucks 1 and 2 from their pool and the full set of packages
-        #     If a truck has >= 8 packages, is close to hub, and their sublist is empty return to hub
-        #     Finish other truck
-        # Queue up truck 3
-
-        # check if we are finished
-        # if len(package_bucket) == 0:
-        #     done = True
-        #     for b in truck_bucket:
-        #         if len(b) > 0:
-        #             done = False
-
-        # This algorithm loads all packages onto trucks in order without regard to any requirements or efficiency
-        # Operates in O(n) time where n is the number of packages
-        truck_pointer = 0
-        packages_in_truck = 0
-        for p in packages:
-            # make sure current truck has room for packages, move to next truck if not
-            if packages_in_truck == self._load_limit:
-                truck_pointer += 1
-                packages_in_truck = 0
-
-            trucks[truck_pointer].load_package(p)
-            packages_in_truck += 1
-            # print("Loaded package " + repr(p.get_id()) + " onto truck " + repr(truck_pointer + 1))
