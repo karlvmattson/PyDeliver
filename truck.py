@@ -13,7 +13,7 @@ class Truck:
         self.format = "%H:%M"
         self.delivery_queue = []
         self._distance_traveled = 0
-        self._current_time = 0
+        self._current_time = datetime.datetime.min
         self._current_location = "HUB"
         self._earliest_departure = earliest_departure
         self.early_package_count = 0
@@ -53,8 +53,6 @@ class Truck:
 
     def load_package(self, package):
         self.delivery_queue.append(package)
-        # package.set_status("Loaded")
-        #   print("Now carrying " + repr(len(self.delivery_queue)) + " packages.")
 
     def deliver(self, package):
         package.set_status("Delivered")
@@ -63,14 +61,14 @@ class Truck:
             if package.get_deadline() < self._current_time:
                 print("Package was delivered late!")
 
+    # Moves the truck from its current location to a destination.
+    # Increments truck time based on distance and truck speed.
     def travel(self, destination, distance_table, end_time):
 
         # calculate distance to next stop
         distance = distance_table.get_distance(self._current_location, destination)
-        # print("Distance from " + self._current_location + " to " + destination + " is " + repr(distance))
 
         # increment distance and time, set current location to next stop
-        # print("Time before traveling is " + self.get_current_time().strftime(self.format))
         self.set_distance_traveled(self.get_distance_traveled() + distance)
         time = self.get_current_time()
         new_time = time + datetime.timedelta(hours=(distance / self.get_speed()))
@@ -79,11 +77,10 @@ class Truck:
             return False
 
         self.set_current_time(new_time)
-        # print("Time after traveling is " + self.get_current_time().strftime(self.format))
         self.set_current_location(destination)
         return True
 
-    # main simulation for an individual truck
+    # main delivery simulation for an individual truck
     def depart(self, time, distancetable, end_time):
         self.set_current_time(time)
 

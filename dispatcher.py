@@ -22,17 +22,17 @@ class Dispatcher:
         last_truck_returned = self._current_time
 
         # check if there are trucks to send
+        # also check that program has not reached the user-specified end time
         while trucks_returned < trucks_to_send and end_time > current_time:
             # check if truck is eligible to depart
             for t in trucks:
                 if drivers_at_hub > 0 and t.package_count() > 0 and t.get_earliest_departure() <= current_time:
                     # if so, send truck
                     drivers_at_hub -= 1
-                    print("Sending truck at " + current_time.strftime(self.format))
                     result = t.depart(current_time, self._distances, end_time)
-                    #     print("Truck returned at " + result[0].strftime(self.format) + " after driving " + repr(
-                    #        result[1]) + " miles.")
+                    # gets truck's distance
                     distance_traveled += result[1]
+                    # record the time the truck returned
                     if last_truck_returned < result[0]:
                         last_truck_returned = result[0]
                     trucks_returned += 1

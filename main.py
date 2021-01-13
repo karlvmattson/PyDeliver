@@ -28,10 +28,8 @@ truck_list = [truck.Truck(starting_time) for i in range(total_trucks)]
 # load trucks
 truck_loader = truckloader.TruckLoader(total_drivers, truck_load_limit, starting_time, vehicle_speed)
 truck_loader.load_trucks(truck_list, packages, distances)
-# for t in range(len(truck_list)):
-#     print("Truck " + repr(t) + " has " + repr(truck_list[t].package_count()) + " packages.")
-# print("Load process finished...")
 
+# display user interface and get user input
 is_valid_input = False
 user_input = ""
 while not is_valid_input:
