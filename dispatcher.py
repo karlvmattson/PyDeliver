@@ -52,14 +52,14 @@ class Dispatcher:
             # if no truck eligible to depart, advance time until a truck is eligible
             # are we out of drivers?
             if drivers_at_hub == 0:
-                print("Waiting for driver...")
+                # print("Waiting for driver...")
                 # advance time until a driver is available
                 current_time = driver_availability.pop(0)
                 drivers_at_hub += 1
             else:
                 # we must be waiting for a truck to reach its earliest departure
                 # advance time to next available truck
-                print("Waiting for next truck to be eligible to depart...")
+                # print("Waiting for next truck to be eligible to depart...")
                 earliest_truck = [0, datetime.datetime.max]
                 for t in range(len(trucks)):
                     departure = trucks[t].get_earliest_departure()

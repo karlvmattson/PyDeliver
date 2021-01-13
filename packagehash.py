@@ -30,7 +30,7 @@ class PackageHash:
 
         # resize list if it is too small for the new id
         if new_id >= len(self._hash_table):
-            self._hash_table.append([None] * (1 + new_id - len(self._hash_table)))
+            self._hash_table.extend([None] * (1 + new_id - len(self._hash_table)))
 
         # store new information
         self._hash_table[new_id] = package
@@ -53,7 +53,7 @@ class PackageHash:
     def print_all(self):
         for p in range(len(self._hash_table)):
             if self.get_package(p) is not None:
-                pack = self.get_package(p)
+                pack = self.get_package(p + 1)
                 i = pack.get_id()
                 address = pack.get_address()
                 departure = pack.get_departed()
